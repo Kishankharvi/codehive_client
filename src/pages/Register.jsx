@@ -53,7 +53,7 @@ const Register = () => {
                     <div className="space-y-6">
                         {[
                             'Real-time collaborative editing',
-                            'Integrated terminal & compilation',
+                            // 'Integrated terminal & compilation',
                             'GitHub repository sync',
                             'Team management & permissions'
                         ].map((item, idx) => (

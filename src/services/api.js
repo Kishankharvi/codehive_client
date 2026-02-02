@@ -42,4 +42,20 @@ api.interceptors.response.use(
     }
 );
 
+// File Management API methods
+export const fileAPI = {
+    createFile: (projectId, branch, filePath, content = '') =>
+        api.post(`/projects/${projectId}/files/${branch}/create`, { filePath, content }),
+
+    deleteFile: (projectId, branch, filePath) =>
+        api.delete(`/projects/${projectId}/files/${branch}/${filePath}`),
+
+    renameFile: (projectId, branch, oldPath, newPath) =>
+        api.put(`/projects/${projectId}/files/${branch}/rename`, { oldPath, newPath }),
+
+    createDirectory: (projectId, branch, dirPath) =>
+        api.post(`/projects/${projectId}/directories/${branch}/create`, { dirPath })
+};
+
 export default api;
+

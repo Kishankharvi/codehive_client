@@ -6,8 +6,10 @@ import api from '../services/api';
 import socketService from '../services/socketService';
 import FileExplorer from '../components/FileExplorer';
 import CodeEditor from '../components/CodeEditor';
+import ChangesPanel from '../components/ChangesPanel';
+import PushToGitHubButton from '../components/PushToGitHubButton';
 import emailjs from '@emailjs/browser';
-import { FaArrowLeft, FaUsers, FaCodeBranch, FaPlus, FaMoon, FaSun, FaCog, FaCode } from 'react-icons/fa';
+import { FaArrowLeft, FaUsers, FaCodeBranch, FaPlus, FaMoon, FaSun, FaCog, FaCode, FaClipboardList } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const ProjectView = () => {
@@ -20,6 +22,7 @@ const ProjectView = () => {
     const [loading, setLoading] = useState(true);
     const [showBranchModal, setShowBranchModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
+    const [showChangesPanel, setShowChangesPanel] = useState(false);
     const { user } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
@@ -118,26 +121,30 @@ const ProjectView = () => {
             // Close modal immediately
             setShowCollabModal(false);
 
-            // Send email via EmailJS (Client-side)
-            // Note: You need to replace ServiceID, TemplateID, and PublicKey with your actual EmailJS credentials
-            // For now, we'll wrap it in a try-catch to avoid breaking the UI if keys aren't set
+
+            // Send email via EmailJS
+            // SETUP REQUIRED: Replace the placeholders below with your EmailJS credentials
+            // Follow the guide in: emailjs_setup_guide.md
             try {
-                // Example: using emailjs-com or @emailjs/browser
-                // import emailjs from '@emailjs/browser'; <-- locally imported/required if strict
+                await emailjs.send(
+                    'service_z6m71fg',        // ← Replace with your EmailJS Service ID
+                    'template_7xgz2gk',       // ← Replace with your EmailJS Template ID
+                    {
+                        to_name: username,
+                        from_name: user.username,
+                        project_name: project.name,
+                        role: formData.get('role'),
+                        project_url: `${window.location.origin}/project/${projectId}`
+                    },
+                    'K-y3iYGoy2CyGTCg1'         // ← Replace with your EmailJS Public Key
+                );
 
-                // Mocking the email send for now or using global if initialized.
-                // ideally: await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', { to_name: username, ... }, 'YOUR_PUBLIC_KEY');
-
-                console.log('[EmailJS] Sending invitation email to', username);
-
-                // Simulating email delay
-                // await emailjs.send(...)
-
-                toast.success(`Invitation sent to ${username} via email`);
+                toast.success(`Invitation email sent to ${username}!`);
             } catch (emailError) {
                 console.error('[EmailJS Error]', emailError);
                 toast.error('Collaborator added, but failed to send email invite.');
             }
+
 
             fetchProject();
         } catch (error) {
@@ -218,7 +225,20 @@ const ProjectView = () => {
                         </button>
                     )}
 
+                    {/* Push to GitHub Button */}
+                    {isOwner && <PushToGitHubButton projectId={projectId} project={project} branch={currentBranch} />}
+
                     <div className="h-5 w-px bg-[var(--border-subtle)] mx-1"></div>
+
+                    {/* Changes Button */}
+                    <button
+                        onClick={() => setShowChangesPanel(!showChangesPanel)}
+                        className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-main)] transition-colors relative"
+                        aria-label="View Changes"
+                        title="Pending Changes"
+                    >
+                        <FaClipboardList className="text-xs" />
+                    </button>
 
                     {/* Theme Toggle */}
                     <button
@@ -244,12 +264,25 @@ const ProjectView = () => {
                             fileTree={fileTree}
                             onFileSelect={setSelectedFile}
                             selectedFile={selectedFile}
+                            onRefresh={fetchFileTree}
+                            projectId={projectId}
+                            branch={currentBranch}
                         />
                     </div>
                 </div>
 
                 {/* Editor Area */}
                 <div className="flex-1 overflow-hidden bg-[var(--bg-main)] relative flex flex-col">
+                    {/* Changes Panel Sidebar */}
+                    {showChangesPanel && (
+                        <div className="absolute top-0 right-0 w-96 h-full bg-[var(--bg-secondary)] border-l border-[var(--border-subtle)] z-10 shadow-lg">
+                            <ChangesPanel
+                                projectId={projectId}
+                                branch={currentBranch}
+                                isOwner={isOwner}
+                            />
+                        </div>
+                    )}
                     {selectedFile ? (
                         <>
                             {/* File Tab - Basic implementation */}

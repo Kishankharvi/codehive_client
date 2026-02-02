@@ -39,7 +39,7 @@ const Login = () => {
                 <div className="relative z-10 max-w-lg">
                     <div className="inline-flex items-center gap-3 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                        <span className="text-sm font-medium">CodeHive v2.0 Live</span>
+                        <span className="text-sm font-medium">CodeHive </span>
                     </div>
                     <h1 className="text-6xl font-bold mb-6 leading-tight tracking-tight">
                         Build faster, <br />
@@ -59,7 +59,7 @@ const Login = () => {
                                 </div>
                             ))}
                         </div>
-                        <span className="text-sm text-gray-400 font-medium">+4,200 developers joined</span>
+                        <span className="text-sm text-gray-400 font-medium">+4 developers joined</span>
                     </div>
                 </div>
             </div>
